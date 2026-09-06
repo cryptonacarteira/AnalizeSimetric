@@ -1,141 +1,119 @@
-const eua = [
-    {sigla: 'S&P 500', pid: '8839'},
-    {sigla: 'Nasdaq', pid: '8874'},
-    {sigla: 'Dow Jones', pid: '8873'},
-    {sigla: "VIX", pid: '44336'},
-];
+var tables = {
+    eua: [
+        { pid: '169', name: 'S&P 500' },
+        { pid: '166', name: 'NASDAQ' },
+        { pid: '172', name: 'DOW JONES' },
+        { pid: '27-7503', name: 'VIX' }
+    ],
+    commodities: [
+        { pid: '8833', name: 'WTI OIL' },
+        { pid: '8830', name: 'GOLD' },
+        { pid: '8831', name: 'COBRE' },
+        { pid: '8836', name: 'BCOM' }
+    ],
+    dx: [
+        { pid: '8839', name: 'DX' },
+        { pid: '2111', name: 'USD/EUR' },
+        { pid: '2123', name: 'USD/JPY' },
+        { pid: '2124', name: 'USD/GBP' },
+        { pid: '2126', name: 'USD/CAD' },
+        { pid: '2119', name: 'USD/SEK' },
+        { pid: '2138', name: 'USD/CHF' }
+    ],
+    europa: [
+        { pid: '178', name: 'STOXX 600' },
+        { pid: '179', name: 'REINO UNIDO' },
+        { pid: '172', name: 'ALEMANHA' },
+        { pid: '175', name: 'MILÃO' },
+        { pid: '177', name: 'MADRI' }
+    ],
+    brasil: [
+        { pid: '2103', name: 'USD/BRL' },
+        { pid: '941612', name: 'INDFUT' },
+        { pid: '1138885', name: 'BRL10Y' },
+        { pid: '1177002', name: 'CDS5YBRL' }
+    ],
+    emergentes: [
+        { pid: '2103', name: 'USD/BRL' },
+        { pid: '2112', name: 'USD/MXN' },
+        { pid: '2186', name: 'USD/ZAR' },
+        { pid: '2288', name: 'USD/CNY' },
+        { pid: '2273', name: 'USD/TRY' },
+        { pid: '2190', name: 'USD/INR' },
+        { pid: '2175', name: 'USD/RUB' },
+        { pid: '2272', name: 'USD/HUF' },
+        { pid: '2268', name: 'USD/PLN' },
+        { pid: '2258', name: 'USD/CZK' },
+        { pid: '2271', name: 'USD/IDR' }
+    ],
+    latam: [
+        { pid: '2103', name: 'USD/BRL' },
+        { pid: '2158', name: 'USD/ARS' },
+        { pid: '2164', name: 'USD/CLP' },
+        { pid: '2170', name: 'USD/COP' },
+        { pid: '2232', name: 'USD/PEN' },
+        { pid: '2256', name: 'USD/PYG' },
+        { pid: '2255', name: 'USD/UYU' },
+        { pid: '2254', name: 'USD/BOB' }
+    ],
+    curva: [
+        { pid: '23701', name: 'US2Y' },
+        { pid: '23703', name: 'US10Y' },
+        { pid: '23705', name: 'US30Y' }
+    ],
+    dolar: [
+        { pid: '2253', name: 'USD/CRC' },
+        { pid: '2252', name: 'USD/DOP' },
+        { pid: '2251', name: 'USD/HNL' },
+        { pid: '2250', name: 'USD/HTG' },
+        { pid: '2249', name: 'USD/JMD' },
+        { pid: '2248', name: 'USD/NIO' },
+        { pid: '2247', name: 'USD/SVC' },
+        { pid: '2246', name: 'USD/DKK' },
+        { pid: '2245', name: 'USD/NOK' },
+        { pid: '2244', name: 'USD/EGP' },
+        { pid: '2243', name: 'USD/NGN' },
+        { pid: '2242', name: 'USD/HKD' },
+        { pid: '2241', name: 'USD/ILS' },
+        { pid: '2240', name: 'USD/KRW' },
+        { pid: '2239', name: 'USD/PHP' },
+        { pid: '2238', name: 'USD/SGD' },
+        { pid: '2237', name: 'USD/THB' },
+        { pid: '2236', name: 'USD/TWD' },
+        { pid: '2235', name: 'USD/AUD' },
+        { pid: '2234', name: 'USD/NZD' },
+        { pid: '2233', name: 'USD/CUP' },
+        { pid: '2231', name: 'USD/PAB' },
+        { pid: '2230', name: 'USD/MYR' }
+    ],
+    cryptos: [
+        { pid: '945629', name: 'BTC/USD' },
+        { pid: '1057391', name: 'ETH/USD' }
+    ]
+};
 
-const curva_eua = [
-    {sigla: 'US2Y', pid: '23701'},
-    {sigla: 'US10Y', pid: '23705'},
-    {sigla: 'US30Y', pid: '23706'}
-];
+var pid_arr = [];
 
-const commodities = [
-    {origem: "Petróleo EUA", sigla: 'WTI Oil', pid: '8849'},
-    {origem: "Ouro Futuro CME", sigla: 'Gold', pid: '8830'},
-    {origem: "Cobre", sigla: "Cobre", pid: '8831'},
-    {origem: "Bloomberg Commodities", sigla: "BCOM", pid: '948434'},
-];
+function buildTable(tableName, data) {
+    var tableBody = $('#' + tableName + '-table');
+    tableBody.empty();
+    
+    data.forEach(function(item) {
+        pid_arr.push(item.pid);
+        var row = '<tr class="pid-' + item.pid + '-line">' +
+            '<td class="pid-' + item.pid + '-ativo">' + item.name + '</td>' +
+            '<td class="pid-' + item.pid + '-percentil"><div class="demo-container"><div class="progress-bar progress-bar-value"></div></div></td>' +
+            '<td class="pid-' + item.pid + '-pcp">0,00%</td>' +
+            '<td class="pid-' + item.pid + '-last">0,00</td>' +
+            '</tr>';
+        tableBody.append(row);
+    });
 
-const brasil = [
-    {origem: "Dólar Brasil", sigla: 'USD/BRL', pid: '2103'},
-    {origem: "IBOV Futuro", sigla: 'INDFUT', pid: '941612'},
-    {origin: "BRL10Y", sigla: "BRL10Y", pid: '24029'},
-    {origem: "CDS5YBRL", sigla: "CDS5YBRL", pid: '1116031'},
-];
-
-const cryptos = [
-    {origem: "Bitcoin", sigla: "USD/BTC", pid: "1057391"},
-    {origem: "Ethereum", sigla: "USD/ETH", pid: "1061443"},
-];
-
-const dx = [
-    {origem: "Índice Dólar", sigla: 'DX', pid: '8827'},
-    {origem: "Euro", sigla: 'USD/EUR', pid: '2124'},
-    {origem: "Japão", sigla: 'USD/JPY', pid: '3'},
-    {origem: "Inglaterra", sigla: 'USD/GBP', pid: '2126'},
-    {origem: "Canadá", sigla: 'USD/CAD', pid: '7'},
-    {origem: "Suecia", sigla: 'USD/SEK', pid: '41'},
-    {origem: "Suiça", sigla: 'USD/CHF', pid: '4'}
-];
-
-const emergentes = [
-    {origem: "Brasil", sigla: 'USD/BRL', pid: '2103'},
-    {origem: "México", sigla: 'USD/MXN', pid: '39'},
-    {origem: "África do Sul", sigla: 'USD/ZAR', pid: '17'},
-    {origem: "China", sigla: 'USD/CNY', pid: '2111'},
-    {origem: "Turquia", sigla: 'USD/TRY', pid: '18'},
-    {origem: "Índia", sigla: 'USD/INR', pid: '160'},
-    {origem: "Rússia", sigla: 'USD/RUB', pid: '2186'},
-    {origem: "Hungria", sigla: 'USD/HUF', pid: '91'},
-    {origem: "Polônia", sigla: 'USD/PLN', pid: '40'},
-    {origem: "Chéquia", sigla: 'USD/CZK', pid: '103'},
-    {origem: "Indonésia", sigla: 'USD/IDR', pid: '2138'},
-];
-
-const latam = [
-    {origem: "Brasil", sigla: 'USD/BRL', pid: '2103'},
-    {origem: "Argentina", sigla: "USD/ARS", pid: '2090'},
-    {origem: "Chile", sigla: "USD/CLP", pid: "2110"},
-    {origem: "Colombia", sigla: "USD/COP", pid: "2112"},
-    {origem: "Peru", sigla:"USD/PEN", pid: "2177"},
-    {origem: "Paraguai", sigla:"USD/PYG", pid: "2181"},
-    {origem: "Uruguai", sigla:"USD/UYU", pid: "2210"},
-    {origem: "Bolivia", sigla: 'USD/BOB', pid: '2102'},
-];
-
-const europa = [
-    {sigla: "Stoxx 600", pid: "40823"},
-    {sigla: 'Reino Unido', pid: '27'}, // FTSE 100
-    {sigla: 'Alemanha', pid: '8826'}, // DAX   
-    {sigla: "Milão", pid: "177"},
-    {sigla: "Madri", pid:"24228"},
-    {sigla: 'França', pid: '167'} //CAC 40
-];
-
-const dolar = [
-    {origem: "Costa Rica", sigla: "USD/CRC", pid: "2113"},
-    {origem: "Republica Dominicana", sigla: "USD/DOP", pid:"2118"},
-    {origem: "Honduras", sigla: "USD/HNL", pid: "2135"},
-    {origem: "Haiti", sigla:"USD/HTG", pid: "2137"},
-    {origem: "Jamaica", sigla:"USD/JMD", pid: "2142"},
-    {origem: "Nicarágua", sigla:"USD/NIO", pid: "2172"},
-    {origem: "El Salvador", sigla:"USD/SVC", pid: "2199"},
-    {origem: "Dinamarca", sigla:"USD/DKK", pid: "43"},
-    {origem: "Noruega", sigla:"USD/NOK", pid: "59"},
-    {origem: "Egito", sigla:"USD/EGP", pid: "2122"},
-    {origem: "Nigéria", sigla:"USD/NGN", pid: "2171"},
-    {origem: "Hong Kong", sigla:"USD/HKD", pid: "155"},
-    {origem: "Israel", sigla:"USD/ILS", pid: "63"},
-    {origem: "Coreia do Sul", sigla:"USD/KRW", pid: "650"},
-    {origem: "Filipinas", sigla:"USD/PHP", pid: "2179"},
-    {origem: "Cingapura", sigla:"USD/SGD", pid: "42"},
-    {origem: "Tailândia", sigla:"USD/THB", pid: "147"},
-    {origem: "Taiwan", sigla:"USD/TWD", pid: "2206"},
-    {origem: "Austrália", sigla:"USD/AUD", pid: "2091"},
-    {origem: "Nova Zelândia", sigla:"USD/NZD", pid: "2174"},
-    {origem: "Cuba", sigla: "USD/CUP", pid: "2114"},
-    {origem: "Panamá", sigla:"USD/PAB", pid: "2176"},
-    {origem: "Malásia", sigla:"USD/MYR", pid: "2168"},
-]
-
-let all_data = eua.concat(dolar, dx, emergentes, europa, cryptos, latam, brasil, commodities, curva_eua);
-
-const row = (obj) => {
-    return `
-        <tr class="pid-${obj.pid}-line">
-            <td class="pid-${obj.pid}-ativo text-left text-uppercase font-weight-bold">${obj.sigla}</td>
-            <td class="pid-${obj.pid}-percentil">
-                <div class="demo-container">
-                    <div class="progress-bar">
-                        <div class="progress-bar-value"></div>
-                    </div>
-                </div>
-            </td>
-            <td class="pid-${obj.pid}-pcp text-center font-weight-bold"">0,00%</td>
-            <td class="pid-${obj.pid}-last font-weight-bold">0,00</td>
-        </tr>`;
+    summary.initSummary('#' + tableName + '-table', data);
 }
 
-const createTable = (table_name, data) => {
-    const tbody = document.querySelector(table_name);
-    tbody.innerHTML = data.map(obj => row(obj)).join('');
-    summary.initSummary(table_name, data);
-}
-
-createTable('#eua-table', eua);
-createTable('#curva-table', curva_eua);
-createTable('#commodities-table', commodities);
-createTable('#dx-table', dx);
-
-createTable('#brasil-table', brasil);
-createTable('#emergentes-table', emergentes);
-createTable('#latam-table', latam);
-
-createTable("#dolar-table", dolar);
-
-createTable('#europa-table', europa);
-createTable('#cryptos-table', cryptos);
-
-var pid_arr = all_data.map( obj => `pid-${obj.pid}:`);
+$(document).ready(function() {
+    $.each(tables, function(key, value) {
+        buildTable(key, value);
+    });
+});
